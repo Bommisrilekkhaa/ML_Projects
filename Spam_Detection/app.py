@@ -4,8 +4,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 import joblib
 
 # Load the saved model
-classifier = joblib.load("./spam_clf.joblib")
-vect = joblib.load("./vectorizer.joblib")
+classifier = joblib.load("spam_clf.joblib")
+vect = joblib.load("vectorizer.joblib")
 # Streamlit UI
 st.title("Spam Classification App")
 
