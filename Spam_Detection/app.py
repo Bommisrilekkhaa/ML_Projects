@@ -15,13 +15,10 @@ vect_path = os.path.join(current_directory, "vectorizer.joblib")
 print(f"Attempting to load model from: {clf_path}")
 print(f"Attempting to load vectorizer from: {vect_path}")
 
-try:
-    classifier = joblib.load(clf_path)
-    
-    vect = joblib.load(vect_path)
-    print("Model loaded successfully.")
-except Exception as e:
-    print(f"Error loading model: {e}")
+classifier = joblib.load(clf_path)
+
+vect = joblib.load(vect_path)
+print("Model loaded successfully.")
 
 # Streamlit UI
 st.title("Spam Classification App")
@@ -34,6 +31,8 @@ if st.button("Classify"):
     # Preprocess the user input
     user_input_processed = pd.Series(user_input)
     
+    if 'vect' in locals():
+        print("vect is ",(vect is not None))
     if 'vect' in locals() and vect is not None:
         x_user = vect.transform(user_input_processed)
         x_user_df = pd.DataFrame(x_user.toarray(), columns=vect.get_feature_names_out())
