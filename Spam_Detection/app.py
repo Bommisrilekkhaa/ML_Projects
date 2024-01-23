@@ -17,6 +17,7 @@ print(f"Attempting to load vectorizer from: {vect_path}")
 
 try:
     classifier = joblib.load(clf_path)
+    
     vect = joblib.load(vect_path)
     print("Model loaded successfully.")
 except Exception as e:
@@ -32,14 +33,19 @@ user_input = st.text_area("Enter a message:", "Type your message here...")
 if st.button("Classify"):
     # Preprocess the user input
     user_input_processed = pd.Series(user_input)
-    x_user = vect.transform(user_input_processed)
-    x_user_df = pd.DataFrame(x_user.toarray(), columns=vect.get_feature_names_out())
+    
+    if 'vect' in locals() and vect is not None:
+        x_user = vect.transform(user_input_processed)
+        x_user_df = pd.DataFrame(x_user.toarray(), columns=vect.get_feature_names_out())
 
-    # Make prediction
-    prediction = classifier.predict(x_user_df)
+        # Make prediction
+        prediction = classifier.predict(x_user_df)
 
-    # Display the result
-    if prediction[0] == 'ham':
-        st.success("Prediction: Not Spam")
+        # Display the result
+        if prediction[0] == 'ham':
+            st.success("Prediction: Not Spam")
+        else:
+            st.error("Prediction: Spam")
     else:
-        st.error("Prediction: Spam")
+        st.error("Error: Vectorizer is not defined.")
+    
