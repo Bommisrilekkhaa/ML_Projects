@@ -15,9 +15,11 @@ vect_path = os.path.join(current_directory, "vectorizer.joblib")
 print(f"Attempting to load model from: {clf_path}")
 print(f"Attempting to load vectorizer from: {vect_path}")
 
-classifier = joblib.load(clf_path)
+with open(clf_path, "rb") as file:
+    classifier = joblib.load(file)
 
-vect = joblib.load(vect_path)
+with open(vect_path, "rb") as file:
+    vect = joblib.load(file)
 print("Model loaded successfully.")
 
 # Streamlit UI
