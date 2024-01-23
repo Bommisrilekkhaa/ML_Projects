@@ -2,10 +2,26 @@ import pandas as pd
 import streamlit as st
 from sklearn.feature_extraction.text import CountVectorizer
 import joblib
+import os
 
-# Load the saved model
-classifier = joblib.load("spam_clf.joblib")
-vect = joblib.load("vectorizer.joblib")
+# Get the absolute path to the current directory
+current_directory = os.path.dirname(__file__)
+
+# Specify the absolute path to "spam_clf.joblib"
+clf_path = os.path.join(current_directory, "spam_clf.joblib")
+vect_path = os.path.join(current_directory, "vectorizer.joblib")
+
+# Print the file path for debugging
+print(f"Attempting to load model from: {clf_path}")
+print(f"Attempting to load vectorizer from: {vect_path}")
+
+try:
+    classifier = joblib.load(clf_path)
+    vect = joblib.load(vect_path)
+    print("Model loaded successfully.")
+except Exception as e:
+    print(f"Error loading model: {e}")
+
 # Streamlit UI
 st.title("Spam Classification App")
 
