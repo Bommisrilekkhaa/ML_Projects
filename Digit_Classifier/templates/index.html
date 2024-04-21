@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST Digit Recognition</title>
+    <style>
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif cursive;
+            font-style: italic;
+            text-align: center;
+            background-image: url('/static/num_bgnd.avif');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            background-color: #5f5f5f;
+            color: #ffffff;
+            margin-bottom: 20px;
+            padding:20px;
+            border-radius: 5px;
+            box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #uploadInput {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: none;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #digitCanvas {
+            background-color: #9a9a9a;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 10px rgba(1, 1, 0, 0.1);
+        }
+
+        #predictButton {
+            padding: 10px 20px;
+            background-color: #44dc49;
+            color: #ffffff;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #predictButton:hover {
+            background-color: #8fff94;
+        }
+        #predictionResult{
+            display: none;
+            padding:20px;
+            background-color: #fff;
+            font-weight: bolder;
+            border-radius: 5px;
+            box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>MNIST Digit Recognition</h1>
+    
+    <input type="file" id="uploadInput" accept="image/*" onchange="loadImage()" />
+    <canvas id="digitCanvas" width="280" height="280" style="border:1px solid #000;"></canvas>
+    
+    <button id="predictButton" onclick="predictDigit()">Predict Digit</button>
+    <div id="predictionResult"></div>
+    <script>
+        function loadImage() {
+            var input = document.getElementById('uploadInput');
+            var canvas = document.getElementById('digitCanvas');
+            var ctx = canvas.getContext('2d');
+
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var img = new Image();
+                img.onload = function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function predictDigit() {
+            var canvas = document.getElementById("digitCanvas");
+            var ctx = canvas.getContext("2d");
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            
+            var imageArray = [];
+            for (var i = 0; i < imageData.length; i += 4) {
+                // Use the red channel as the grayscale value
+                imageArray.push(imageData[i] / 255.0);
+            }
+
+            // Send the flattened image data to the server for prediction
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    imageData: imageArray
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                var predictionResultDiv = document.getElementById("predictionResult");
+                predictionResultDiv.innerText = 'Predicted Digit: ' + data.result;
+                predictionResultDiv.style.display = 'block';})
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
